@@ -1,3 +1,7 @@
 <Solution>
-  <Project Path="TaskFlow/TaskFlow.csproj" />
+  <Project Path="Application/TaskFlow.Application.csproj" Id="91ef209d-c7e1-4928-8423-0cc1abe6204f" />
+  <Project Path="Domain/TaskFlow.Domain.csproj" Id="1b9604b5-7d4f-49d8-97aa-d23f89c5c9f8" />
+  <Project Path="TaskFlow.Infrastructure/TaskFlow.Infrastructure.csproj" Id="cff1ef29-eb51-4915-a25d-28ea1167d207" />
+  <Project Path="TaskFlow.Tests/TaskFlow.Tests.csproj" Id="ffc891ef-3cca-4984-84ac-fe929ae89296" />
+  <Project Path="TaskFlow/TaskFlow.API.csproj" />
 </Solution>
