@@ -1,5 +1,4 @@
-﻿using TaskFlow.Domain.Enums;
-
+﻿using TaskFlow.Domain.Common;
 using TaskFlow.Domain.Enums;
 
 namespace TaskFlow.Domain.Entities
@@ -15,5 +14,7 @@ namespace TaskFlow.Domain.Entities
         public string AssignedTo { get; set; } = string.Empty;
 
         public DateTime DueDate { get; set; }
+
+        public ICollection<StatusChange> StatusChanges { get; set; } = new List<StatusChange>();
     }
 }
