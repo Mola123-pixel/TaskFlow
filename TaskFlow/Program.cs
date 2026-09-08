@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using TaskFlow.Infrastructure.Data;
+using TaskFlow.Infrastructure.Persistence.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

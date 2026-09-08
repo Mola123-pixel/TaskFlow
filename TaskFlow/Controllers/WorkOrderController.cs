@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TaskFlow.Application.DTOs;
 using TaskFlow.Application.DTOs.WorkOrder;
+using TaskFlow.Domain.Entities;
 using TaskFlow.Domain.Enums;
-using TaskFlow.Infrastructure.Data;
+using TaskFlow.Infrastructure.Persistence.Data;
 
 namespace TaskFlow.Controllers
 {
@@ -68,7 +70,7 @@ namespace TaskFlow.Controllers
         }
 
         // PUT: api/workorders/{id}
-        [HttpPut("{id:Guid}")]
+        [HttpPut("{id:Guid}, {Status}")]
         public async Task<ActionResult<WorkOrderDto>> Update(Guid id, [FromBody] WorkOrderUpdateDto dto)
         {
             if (!ModelState.IsValid)
@@ -105,6 +107,49 @@ namespace TaskFlow.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(existing);
+        }
+
+        // PATCH: api/workorders/{id}/status
+        [HttpPatch("{id:guid}/status")]
+        public async Task<ActionResult<WorkOrderDto>> UpdateStatus(Guid id, [FromBody] WorkOrderUpdateDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var existing = await _context.Set<WorkOrderDto>().FindAsync(id);
+            if (existing == null)
+                return NotFound();
+
+            if (string.IsNullOrWhiteSpace(dto?.Status))
+                return BadRequest("Status is required.");
+
+            if (!Enum.TryParse<Status>(dto.Status, true, out var parsedStatus))
+                return BadRequest("Invalid status value.");
+
+            existing.Status = parsedStatus;
+
+            _context.Set<WorkOrderDto>().Update(existing);
+            await _context.SaveChangesAsync();
+
+            return Ok(existing);
+        }
+
+        // GET: api/workorders?status={status}
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<WorkOrderDto>>> Get([FromQuery] string? status)
+        {
+            var query = _context.Set<WorkOrderDto>().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                if (!Enum.TryParse<Status>(status, true, out var parsedStatus))
+                    return BadRequest("Invalid status value.");
+
+                query = query.Where(w => w.Status == parsedStatus);
+            }
+
+            var results = await query.ToListAsync();
+            return Ok(results);
         }
     }
 }

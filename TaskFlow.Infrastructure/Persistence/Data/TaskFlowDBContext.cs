@@ -3,8 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using TaskFlow.Application.DTOs;
+using TaskFlow.Domain.Entities;
 
-namespace TaskFlow.Infrastructure.Data
+namespace TaskFlow.Infrastructure.Persistence.Data
 {
     public class TaskFlowDBContext : DbContext
     {

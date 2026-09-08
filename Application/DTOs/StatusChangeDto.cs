@@ -31,6 +31,6 @@ namespace TaskFlow.Application.DTOs
         public string ChangedBy { get; set; } = string.Empty;
 
         [Required]
-        public WorkOrder WorkOrder { get; set; } = null!;
+        public WorkOrderDto WorkOrder { get; set; } = null!;
     }
 }
