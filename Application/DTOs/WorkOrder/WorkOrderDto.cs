@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using TaskFlow.Domain.Entities;
+using TaskFlow.Application.DTOs.StatusChange;
 using TaskFlow.Domain.Enums;
 
-namespace TaskFlow.Application.DTOs
+namespace TaskFlow.Application.DTOs.WorkOrder
 {
     public class WorkOrderDto
     {
@@ -28,6 +27,6 @@ namespace TaskFlow.Application.DTOs
         [Required]
         [DataType(DataType.Date)]
         public DateTime DueDate { get; set; }
-        public ICollection<StatusChange> StatusChanges { get; set; } = new List<StatusChange>();
+        public ICollection<WorkOrderStatusChangeDto> StatusChanges { get; set; } = new List<WorkOrderStatusChangeDto>();
     }
 }

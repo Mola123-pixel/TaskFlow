@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Net.NetworkInformation;
+using TaskFlow.Application.DTOs.WorkOrder;
 using TaskFlow.Domain.Entities;
 using TaskFlow.Domain.Enums;
 
-namespace TaskFlow.Application.DTOs
+namespace TaskFlow.Application.DTOs.StatusChange
 {
-    public class StatusChangeDto
+    public class WorkOrderStatusChangeDto
     {
+        public Guid Id { get; set; }
         [Required]
         [ForeignKey(nameof(WorkOrder))]
         public Guid WorkOrderId { get; set; }
