@@ -1,0 +1,75 @@
+# ==============================
+# Logs
+# ==============================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ==============================
+# Node / Vue
+# ==============================
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# ==============================
+# Visual Studio
+# ==============================
+.vs/
+.vscode/*
+!.vscode/extensions.json
+
+.idea/
+
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.ntvs*
+*.njsproj
+*.sw?
+
+# ==============================
+# .NET / C#
+# ==============================
+bin/
+obj/
+
+# Test results
+TestResults/
+*.trx
+
+# ==============================
+# Visual Studio Code
+# ==============================
+.history/
+
+# ==============================
+# OS files
+# ==============================
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Environment / secrets
+# ==============================
+.env
+.env.local
+.env.*.local
+
+# Keep example environment files
+!.env.example
+!.env.development
+!.env.production
+
+# ==============================
+# NuGet
+# ==============================
+*.nupkg
+*.snupkg
+packages/

@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // DbContext (Infrastructure project)
 builder.Services.AddDbContext<TaskFlowDBContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Controllers + JSON enum as strings
 builder.Services.AddControllers()
@@ -18,6 +18,25 @@ builder.Services.AddControllers()
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()
+    ?? new[]
+    {
+        "http://localhost:5173",
+        "https://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://127.0.0.1:5173"
+    };
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("TaskFlowCors", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
@@ -78,6 +97,7 @@ if (builder.Configuration.GetValue<bool>("SeedData:Enable"))
 }
 
 app.UseHttpsRedirection();
+app.UseCors("TaskFlowCors");
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
