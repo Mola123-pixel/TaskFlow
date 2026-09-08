@@ -88,8 +88,10 @@ public class WorkOrdersController : ControllerBase
                 {
                     Id = x.Id,
                     WorkOrderId = x.WorkOrderId,
+
                     FromStatus = x.FromStatus,
                     ToStatus = x.ToStatus,
+
                     ChangedAt = x.ChangedAt,
                     ChangedBy = x.ChangedBy
                 })
@@ -210,9 +212,6 @@ public class WorkOrdersController : ControllerBase
             workOrder.DueDate = dto.DueDate.Value;
         }
 
-        // Status is deliberately not updated here.
-        // Use PATCH /api/WorkOrders/{id}/status
-
         workOrder.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
@@ -230,12 +229,58 @@ public class WorkOrdersController : ControllerBase
         return Ok(result);
     }
 
-    // PATCH: api/WorkOrders/{id}/status
     [HttpPatch("{id:guid}/status")]
     public async Task<IActionResult> ChangeStatus(
         Guid id,
-        [FromBody] WorkOrderStatusChangeDto dto)
+        [FromBody] System.Text.Json.JsonElement body)
     {
+        if (body.ValueKind == System.Text.Json.JsonValueKind.Undefined ||
+            body.ValueKind == System.Text.Json.JsonValueKind.Null)
+        {
+            ModelState.AddModelError("dto", "The dto field is required.");
+            return ValidationProblem(ModelState);
+        }
+
+        var dto = new WorkOrderStatusChangeDto();
+
+        if (body.TryGetProperty("changedBy", out var changedByProp) &&
+            changedByProp.ValueKind == System.Text.Json.JsonValueKind.String)
+        {
+            dto.ChangedBy = changedByProp.GetString();
+        }
+
+        TaskFlow.Domain.Enums.Status newStatus;
+        if (!body.TryGetProperty("toStatus", out var toStatusProp))
+        {
+            ModelState.AddModelError("$.toStatus", "The dto.toStatus field is required.");
+            return ValidationProblem(ModelState);
+        }
+
+        var parsed = false;
+        if (toStatusProp.ValueKind == System.Text.Json.JsonValueKind.String)
+        {
+            var s = toStatusProp.GetString();
+            parsed = Enum.TryParse<TaskFlow.Domain.Enums.Status>(s, true, out newStatus);
+        }
+        else if (toStatusProp.ValueKind == System.Text.Json.JsonValueKind.Number &&
+                 toStatusProp.TryGetInt32(out var intVal))
+        {
+            newStatus = (TaskFlow.Domain.Enums.Status)intVal;
+            parsed = Enum.IsDefined(typeof(TaskFlow.Domain.Enums.Status), newStatus);
+        }
+        else
+        {
+            parsed = false;
+            newStatus = default!;
+        }
+
+        if (!parsed)
+        {
+            ModelState.AddModelError("$.toStatus",
+                "The JSON value could not be converted to TaskFlow.Domain.Enums.Status.");
+            return ValidationProblem(ModelState);
+        }
+
         if (!ModelState.IsValid)
         {
             return ValidationProblem(ModelState);
@@ -252,9 +297,9 @@ public class WorkOrdersController : ControllerBase
         }
 
         var oldStatus = workOrder.Status;
-        var newStatus = dto.ToStatus;
+        var requestedStatus = newStatus;
 
-        if (oldStatus == newStatus)
+        if (oldStatus == requestedStatus)
         {
             return BadRequest(
                 "The work order is already in the requested status.");
@@ -262,25 +307,23 @@ public class WorkOrdersController : ControllerBase
 
         var now = DateTime.UtcNow;
 
-        // Update work order
-        workOrder.Status = newStatus;
+        workOrder.Status = requestedStatus;
         workOrder.UpdatedAt = now;
 
         // Create status history
-        var statusChange =
-            new StatusChange
-            {
-                Id = Guid.NewGuid(),
-                WorkOrderId = workOrder.Id,
-                FromStatus = oldStatus,
-                ToStatus = newStatus,
-                ChangedAt = now,
-                ChangedBy = dto.ChangedBy
-            };
+        var statusChange = new TaskFlow.Domain.Entities.StatusChange
+        {
+            Id = Guid.NewGuid(),
+            WorkOrderId = workOrder.Id,
+            FromStatus = oldStatus,
+            ToStatus = requestedStatus,
+            ChangedAt = now,
+            ChangedBy = dto.ChangedBy,
+        };
 
         _context.StatusChanges.Add(statusChange);
 
-        // Persist both changes in the same transaction
+        // Persist both changes
         await _context.SaveChangesAsync();
 
         return NoContent();

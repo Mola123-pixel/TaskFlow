@@ -5,7 +5,8 @@ namespace TaskFlow.Infrastructure.Persistence.Data
 {
     public class TaskFlowDBContext : DbContext
     {
-        public TaskFlowDBContext(DbContextOptions<TaskFlowDBContext> options) : base(options)
+        public TaskFlowDBContext(DbContextOptions<TaskFlowDBContext> options)
+            : base(options)
         {
         }
 
@@ -14,24 +15,21 @@ namespace TaskFlow.Infrastructure.Persistence.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // store enums as strings for readability
+            base.OnModelCreating(modelBuilder);
+
+            // Ensure enum values are stored as strings to match existing nvarchar(50) columns
             modelBuilder.Entity<WorkOrder>()
                 .Property(w => w.Status)
                 .HasConversion<string>()
                 .HasMaxLength(50);
 
-            modelBuilder.Entity<WorkOrder>()
-                .Property(w => w.Priority)
+            modelBuilder.Entity<StatusChange>()
+                .Property(sc => sc.FromStatus)
                 .HasConversion<string>()
                 .HasMaxLength(50);
 
             modelBuilder.Entity<StatusChange>()
-                .Property(s => s.FromStatus)
-                .HasConversion<string>()
-                .HasMaxLength(50);
-
-            modelBuilder.Entity<StatusChange>()
-                .Property(s => s.ToStatus)
+                .Property(sc => sc.ToStatus)
                 .HasConversion<string>()
                 .HasMaxLength(50);
 
@@ -40,8 +38,6 @@ namespace TaskFlow.Infrastructure.Persistence.Data
                 .WithMany(w => w.StatusChanges)
                 .HasForeignKey(s => s.WorkOrderId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            base.OnModelCreating(modelBuilder);
         }
     }
 }
