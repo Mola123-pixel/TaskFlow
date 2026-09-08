@@ -8,7 +8,7 @@ using TaskFlow.Domain.Enums;
 
 namespace TaskFlow.Application.DTOs
 {
-    public class StatusChange
+    public class StatusChangeDto
     {
         [Required]
         [ForeignKey(nameof(WorkOrder))]

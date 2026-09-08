@@ -1,4 +1,10 @@
+using Microsoft.EntityFrameworkCore;
+using TaskFlow.Infrastructure.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<TaskFlowDBContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
