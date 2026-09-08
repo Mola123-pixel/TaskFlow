@@ -5,7 +5,7 @@ namespace TaskFlow.Infrastructure.Persistence.Seed_Data
 {
     public static class SeedData
     {
-        internal record SeedWorkOrder(
+        public record SeedWorkOrder(
             string Code,
             string Title,
             string Status,
@@ -14,7 +14,7 @@ namespace TaskFlow.Infrastructure.Persistence.Seed_Data
             DateTime DueDate
         );
 
-        internal static IReadOnlyList<SeedWorkOrder> GetDemoWorkOrders()
+        public static IReadOnlyList<SeedWorkOrder> GetDemoWorkOrders()
         {
             var now = DateTime.UtcNow.Date;
             return new[]
