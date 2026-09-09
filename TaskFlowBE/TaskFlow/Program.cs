@@ -13,20 +13,7 @@ builder.Services.AddDbContext<TaskFlowDBContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ============================================================
-// Controllers + JSON
-// ============================================================
-// Allows enums to be sent/returned as strings:
-//
-// {
-//     "toStatus": "InProgress"
-// }
-//
-// instead of:
-//
-// {
-//     "toStatus": 1
-// }
+
 
 builder.Services
     .AddControllers()
